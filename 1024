@@ -200,3 +200,4 @@ java.lang.NullPointerException: Cannot invoke "String.length()" because "data" i
 마무리 실행
 프로그램 종료
 
+
