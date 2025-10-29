@@ -19,3 +19,10 @@ class MyClass {
         System.out.println("instance 블럭 실행"); // 객체 생성시마다 출력된다.
     }
 }
+
+final 필드 초기값 설정 방법 : 생성자에서 초기값 대입 or 필드 선언 시 초기값 대입
+
+DTO : 화면에 출력하기 위한 목적
+VO : 데이터를 보관, 전송 목적
+
+
