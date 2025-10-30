@@ -39,4 +39,8 @@ if(child instanceof Child) ...
 abstract void func();
 
 인터페이스
-
+인터페이스에 선언한 변수들은 자동으로 컴파일 타임에 public static final 키워드가 붙는다.
+public interface Ex{
+  int MAX_VALUE = 10; 
+  //public static final int MAX_VALUE = 10;
+}
