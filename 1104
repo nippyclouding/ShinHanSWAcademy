@@ -169,3 +169,111 @@ public class EX27 {
     }
 }
 ----------------------------------------------------------------------------------------
+리플렉션 : 런타임에 클래스의 정보를 조사하고 조작할 수 있는 기능
+
+Java는 클래스와 인터페이스의 메타 정보를 Class 객체로 관리한다.
+메타 정보 : 패키지 정보, 타입 정보, 생ㅅ엉자, 필드, 메서드 정보 등을 의미
+리플렉션 : 메타 정보를 런타임에 프로그램에서 읽고 수정하는 행위
+
+Hello hello = new Hello();
+
+Class clazz = Hello.class;
+Class clazz = Class.forName("ShinHan.study.Hello");
+Class clazz = hello.getClass();
+
+Class<Hello> clazz = Hello.class;    //타입 안전
+Class<?> clazz = Class.forName("ShinHan.study.Hello");
+Class<?> clazz = hello.getClass();
+
+윈도우의 최상위 경로는 드라이브(c드라이브, d드라이브), 유닉스와 리눅스는 최상위가 /이다.
+
+----------------------------------------------------------------------------------------
+Annotation
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+public class EX28 {
+    public static void main(String[] args) throws InvocationTargetException, IllegalAccessException {
+        Method[] declaredMethods = Service.class.getDeclaredMethods();
+        for(Method m : declaredMethods){
+            PrintAnnotation pa = m.getAnnotation(PrintAnnotation.class);
+            printLine(pa);
+            m.invoke(new Service());
+            printLine(pa);
+        }
+    }
+
+    private static void printLine(PrintAnnotation pa) {
+        if(pa!=null){
+            int num = pa.number();
+            for(int i=0; i<num; i++){
+                String value = pa.value();
+                System.out.print(value);
+            }
+            System.out.println();
+        }
+    }
+
+    public static class Service{
+        @PrintAnnotation
+        public void method1(){
+            System.out.println("실행 내용 1");
+        }
+        @PrintAnnotation("*")
+        public void method2(){
+            System.out.println("실행 내용 2");
+        }
+        @PrintAnnotation(value = "#", number = 20)
+        public void method3(){
+            System.out.println("실행 내용 3");
+        }
+    }
+    
+    @Target(ElementType.METHOD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface PrintAnnotation{
+        String value() default "-";
+        int number() default 15;
+    }
+
+}
+
+----------------------------------------------------------------------------------------
+제네릭 : 타입을 강제시킨다.
+
+import lombok.Getter;
+import lombok.Setter;
+
+public class EX29 {
+
+    public static void main(String[] args) {
+        Product<Tv, String> produce1 = new Product<>();
+        produce1.setKind(new Tv());
+        produce1.setModel("smart tv");
+        System.out.println(produce1.model);
+        
+        Product<Car, String> produce2 = new Product<>();
+        produce2.setKind(new Car());
+        produce2.setModel("new Car");
+        System.out.println(produce2.model);
+    }
+
+    @Getter @Setter
+    public static class Product<K, M>{
+        private K kind;
+        private M model;
+    }
+
+    public static class Tv{}
+    public static class Car{}
+}
+
+
+----------------------------------------------------------------------------------------
+멀티 스레드
+
