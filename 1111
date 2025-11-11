@@ -35,3 +35,66 @@ test1234
 
 => sys DBA 계정이 아니라 앞으로는 TEST로 사용
 화면 좌측 상단 '접속' 하단의 '+' : 사용자 이름 : 방금 생성한 TESTUSER (대소문자 무관), 비밀번호 : test1234 => 테스트, 접속
+sys 계정 - 우클릭 - 접속 해제, testUser만 사용
+
+2차 프로젝트 - 크롤링 등 여러 데이터를 모아 튜닝 같은 것도 해보라고 말씀하셨다.
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+SQL
+-- sql 실행 : command enter (윈도우는 ctrl enter)
+-- 현재 커서가 위치한 실행문 or 드래그한 실행문
+-- sql 작성 : 대소문자 구분 x, 줄바꿈 제한이 없다, 여러 실행문이 있을 때 실행문 끝에 ;로 구분
+-- 문자열은 ' '로 감싼다.
+select * from emp;
+select ENAME, job from emp;
+select * from dept;
+
+-- distinct는 컬럼 하나에만 적용 가능 // distinct sal, distinct job은 불가
+select distinct SAL, job
+from EMP;
+
+-- not 연산자와 in 연산자를 한 번에 사용 => not in : 조건의 여집합을 구할 때 사용
+select *
+from EMP
+where JOB not in ('manager', 'salesman', 'clerk')
+order by job desc; -- 내림차순, 오름차순은 asc
+
+-- order by 절은 sql문 가장 마지막에 위치 // 가장 나중에 실행, 속도 저하
+
+select distinct job
+from emp;
+
+select empno employee_no, ename employee_name, mgr manager, sal salary, comm commission, deptno department_no
+from EMP
+order by deptno desc, ename asc;
+
+
+select *
+from EMP
+where comm is null
+    and mgr is not null
+    and job in ('MANAGER', 'CLERK')
+    and ename not like '_L%';
+
+select ename, nvl(comm, 0)
+from emp; -- nvl (comm, 0) : comm에 값이 있다면 해당 값 출력, 없다면 0으로 처리
+
+select * from EMP
+where job in ('MANAGER', 'SALESMAN', 'CLERK');
+-- in 연산자 ('..' , '..')
+
+select * from emp where sal >= 2000 and sal <= 3000;
+select * from emp where sal between 2000 and 3000;
+
+-- 날짜
+-- 윈도우 SQL Developer - 도구 - 환경설정 - 데이터베이스 - NLS - 날짜형식을 RRRR/MM/DD로 변경해준다.
+select * from emp where hiredate between '1981-05-01' and '1981-06-09';
+
+/*
+ 날짜 : 시간까지 포함된 데이터 (ex : 주문 일자)
+ 조회 : 주문일자 between '2025-01-01' and '2025-01-31'  => 1월 31일의 00:00:00까지 조회한다.
+ 1월 31일의 자정을 넘긴 하루동안 데이터는 포함되지 않는다.
+ => 해결 1: date >= '2025-01-01'and date < '2025-02-01'
+ => 해결 2: between '2025-01-01 00:00:00' and '2025-01-31 23:59:59'
+ => 해결 3 : 주문 일자 데이터 폼 자체를 동일한 형태로 변환 (YYYY-MM-DD)
+ */
