@@ -25,6 +25,8 @@ SQL 작성 시
 3. 무엇을 가져올 것인지 : select ... 
 
 
+----------------------------------------------------------------------------------------------------------------------------------------
+
 오라클 전용 함수
 
 -- 문자 함수: upper, lower, initcap
@@ -194,4 +196,172 @@ select empno, ename, comm,
         when comm>0 then '수당: ' || comm -- then comm 일 때는 오류가 발생(then 이후에는 문자가 들어가야 한다.)
     end as comm_text
 from emp;
+
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+-- MySQL 전용 함수
+
+-- 문자 함수: upper, lower, initcap (MySQL에는 initcap이 없음)
+SELECT ename, UPPER(ename), LOWER(ename),  -- (오라클과 동일: UPPER, LOWER)
+       CONCAT(UPPER(SUBSTRING(ename, 1, 1)), LOWER(SUBSTRING(ename, 2))) as initcap
+FROM emp;
+
+-- 문자 길이 : LENGTH, CHAR_LENGTH
+SELECT ename, LENGTH(ename), CHAR_LENGTH(ename)  -- (오라클과 동일: LENGTH) // LENGTH는 바이트, CHAR_LENGTH는 문자 수
+FROM emp;
+
+-- 문자열 일부 추출 : SUBSTRING, LEFT, RIGHT // 시작 위치는 1부터
+SELECT SUBSTRING(job, 1, 2), SUBSTRING(job, 5), LEFT(job, 2), RIGHT(job, 3)  -- (오라클과 동일: SUBSTRING = SUBSTR)
+FROM emp;
+
+SELECT SUBSTRING(job, -LENGTH(job)), SUBSTRING(job, -LENGTH(job), 2)  -- (오라클과 동일)
+FROM emp;
+
+-- 문자열 찾기 : INSTR, LOCATE, POSITION // 값이 들어있다면 인덱스를 반환, 없다면 0을 반환
+SELECT INSTR(ename, 'A'), LOCATE('A', ename), POSITION('A' IN ename)  -- (오라클과 동일: INSTR)
+FROM emp;
+
+-- 문자열 변경 : REPLACE
+SELECT '010-123-1222' as replaceBefore,
+       REPLACE('010-123-1222', '-', ' ') as replace1,  -- (오라클과 동일: REPLACE)
+       REPLACE('010-123-1222', '-', '') as replace2;
+
+-- 문자열 더하기 : CONCAT (문자열1, 문자열2, ...) // MySQL은 여러 개 가능
+SELECT CONCAT(empno, ename), CONCAT(empno, ' : ', ename)  -- (오라클과 동일: CONCAT, 단 MySQL은 3개 이상도 가능)
+FROM emp
+WHERE ename = 'SCOTT';
+
+-- 공백 제거 : TRIM, RTRIM, LTRIM
+SELECT CONCAT('[', TRIM(' __ mysql __ '), ']') as Trim,  -- (오라클과 동일: TRIM, RTRIM, LTRIM)
+       CONCAT('[', LTRIM(' __ mysql __ '), ']') as trim_leading,
+       CONCAT('[', RTRIM(' __mysql __ '), ']') as trim_trailing;
+
+
+-- ROUND 함수 // 파라미터 생략 시 소수 첫째자리에서 반올림
+SELECT ROUND(1234.567) as round_default,  -- (오라클과 동일: ROUND)
+       ROUND(1234.567, 0) as round0,
+       ROUND(1234.567, 1) as round1,
+       ROUND(1234.567, 2) as round2,
+       ROUND(1234.567, -1) as roundMinus1,
+       ROUND(1234.567, -2) as roundMinus2;
+
+-- TRUNCATE 함수 // 숫자 버림 (MySQL은 TRUNCATE, Oracle은 TRUNC)
+SELECT TRUNCATE(1234.567, 0) as trunc,
+       TRUNCATE(1234.567, 0) as trunc0,
+       TRUNCATE(1234.567, 1) as trunc1,
+       TRUNCATE(1234.567, 2) as trunc2,
+       TRUNCATE(1234.567, -1) as truncMinus1,
+       TRUNCATE(1234.567, -2) as truncMinus2;
+
+-- CEILING, FLOOR 올림, 내림 (MySQL은 CEILING, Oracle은 CEIL)
+SELECT CEILING(3.14), FLOOR(3.14), CEILING(-3.14), FLOOR(-3.14);  -- (오라클과 동일: FLOOR)
+
+-- 날짜 함수
+SELECT NOW() as now,  -- (다름: Oracle은 SYSDATE)
+       DATE_ADD(NOW(), INTERVAL 1 DAY) as tomorrow, 
+       DATE_SUB(NOW(), INTERVAL 1 DAY) as yesterday;
+
+-- STR_TO_DATE() : 문자열을 날짜 타입으로 변환 (Oracle의 TO_DATE와 동일한 역할)
+-- 오늘 날짜에서 2025년 10월 23일을 빼고, 소수점 자리를 버림
+SELECT TRUNCATE(DATEDIFF(NOW(), STR_TO_DATE('2025-10-23', '%Y-%m-%d')), 0) as day_diff;
+
+-- DATE_ADD, DATE_SUB : 날짜 더하기/빼기 // INTERVAL 사용 (Oracle의 ADD_MONTHS와 유사)
+SELECT NOW(), 
+       DATE_ADD(NOW(), INTERVAL 3 MONTH) as add_3months,
+       DATE_ADD(NOW(), INTERVAL 1 YEAR) as add_1year;
+
+-- TIMESTAMPDIFF : 날짜 간 차이 계산 (초, 분, 시간, 일, 월, 년 단위) // Oracle의 MONTHS_BETWEEN과 유사
+SELECT TIMESTAMPDIFF(MONTH, hiredate, NOW()) as month1,
+       TRUNCATE(TIMESTAMPDIFF(MONTH, hiredate, NOW()), 0) as month2
+FROM emp;
+
+-- LAST_DAY, DAYNAME : 달의 마지막 날짜, 요일 이름
+SELECT NOW(), 
+       DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s'),
+       LAST_DAY(NOW()),  -- (오라클과 동일: LAST_DAY)
+       DATE_ADD(NOW(), INTERVAL (1 - DAYOFWEEK(NOW()) + 2) DAY) as next_monday;
+
+
+
+
+-- 자동 형변환 함수
+
+-- DATE_FORMAT : 날짜 -> 문자 (Oracle의 TO_CHAR와 동일한 역할)
+SELECT DATE_FORMAT(NOW(), '%Y/%m/%d %H:%i:%s') as 현재날짜시간;
+
+-- 문자 -> 숫자 (자동 형변환)
+SELECT 1300 - '1500',  -- (오라클과 동일: 자동 형변환)
+       '1300' + 1500;
+
+-- deptno는 INT 타입이지만 '20'으로 지정해도 자동 형변환이 된다.
+SELECT * FROM emp WHERE deptno = '20'; -- (오라클과 동일: 자동 형변환) 숫자 20으로 자동 형변환
+
+-- CAST, CONVERT : 문자열 -> 숫자 데이터 (Oracle의 TO_NUMBER와 동일한 역할)
+SELECT CAST('1300' AS SIGNED) as cast_number,
+       CONVERT('1300', SIGNED) as convert_number;
+
+
+-- STR_TO_DATE : 문자열 -> 날짜 데이터 (Oracle의 TO_DATE와 동일한 역할)
+SELECT STR_TO_DATE('2024-08-14', '%Y-%m-%d') as todate1,   
+       STR_TO_DATE('20240814', '%Y%m%d') as todate2;
+
+SELECT * FROM emp WHERE hiredate > '1981-06-01'; -- (오라클과 동일: 자동 형변환)
+SELECT * FROM emp WHERE hiredate > STR_TO_DATE('1981/06/01', '%Y/%m/%d');
+
+
+
+-- 랭킹 함수 : 순서를 나타내는 함수, ROW_NUMBER(), RANK(), DENSE_RANK() // 코딩테스트 빈출 유형
+SELECT sal, 
+       ROW_NUMBER() OVER(ORDER BY sal DESC) as RANK1,        -- (오라클과 동일: ROW_NUMBER) sal을 내림차순으로 순서를 나타내며 비교 (행 넘버링)
+       RANK() OVER(ORDER BY sal DESC) as RANK2,              -- (오라클과 동일: RANK) rank : 순위
+       DENSE_RANK() OVER(ORDER BY sal DESC) as RANK3         -- (오라클과 동일: DENSE_RANK) dense_rank : 밀도 순위
+FROM emp;
+
+-- 모두 순위를 매기는 함수
+-- ROW_NUMBER는 동점 처리가 없다, 1 2 3 4 5 ..
+-- RANK는 동점 처리를 하고, 동점 시 다음 순위가 없다, 1, 2, 2, 4, 5 ..
+-- DENSE_RANK는 동점 처리를 하고, 동점 시 다음 순위가 있다, 1, 2, 2, 3, 4 ..
+
+
+
+-- IFNULL : ifnull(null인지 확인할 데이터, null일때 반환할 데이터) , 자바의 orElse와 비슷하다. (Oracle의 NVL과 동일한 역할)
+SELECT empno, ename, sal, comm, sal+comm,
+       IFNULL(comm, 0),
+       sal + IFNULL(comm, 0)
+FROM emp;
+
+-- IF : if(조건, 참일 때 값, 거짓일 때 값) // Oracle의 NVL2와 유사
+SELECT empno, ename, comm,
+       IF(comm IS NOT NULL, 'O', 'X'),
+       IF(comm IS NOT NULL, sal*12 + comm, sal * 12) as annsal
+FROM emp;
+
+-- CASE // 자주 사용된다. (Oracle의 DECODE 대신 CASE 사용)
+SELECT empno, ename, job, sal,
+       CASE job -- job에 대해서
+           WHEN 'MANAGER' THEN sal*1.1     -- manager일 땐 1.1 인상
+           WHEN 'SALESMAN' THEN sal*1.05   -- salesman일 땐 1.05 인상
+           WHEN 'ANALYST' THEN sal         -- analyst일 땐 유지
+           ELSE sal * 1.03                 -- default값 : 1.03 인상
+       END as UPSAL
+FROM emp;
+
+-- CASE 
+SELECT empno, ename, job, sal,
+    CASE job -- (오라클과 동일: CASE) case 뒤에 조건이 있을 때
+        WHEN 'MANAGER' THEN sal*1.1
+        WHEN 'SALESMAN' THEN sal*1.05
+        WHEN 'ANALYST' THEN sal
+        ELSE sal*1.03
+    END as upsal
+FROM emp;
+       
+SELECT empno, ename, comm,
+    CASE -- (오라클과 동일: CASE) case 뒤에 조건이 없을 때
+        WHEN comm IS NULL THEN '해당사항없음'
+        WHEN comm = 0 THEN '수당없음'
+        WHEN comm > 0 THEN CONCAT('수당: ', comm) -- MySQL은 || 대신 CONCAT 사용
+    END as comm_text
+FROM emp;
 
