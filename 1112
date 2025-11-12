@@ -197,6 +197,15 @@ select empno, ename, comm,
     end as comm_text
 from emp;
 
+-- avg 계산 시 nvl(comm, 0) : null이라면 0으로 변경 후 평균을 계산해야한다. // count, avg는 신경쓰며 사용해야 한다.
+-- count(*) : null 포함, count(컬럼) : null을 제외
+select avg(comm), sum(comm), avg(nvl(comm,0)) from emp;
+
+select deptno, job, avg(sal)
+from emp
+group by deptno, job  -- deptno로 먼저 그룹화, 이후 job으로 소그룹 분류
+order by deptno, job;
+
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 
