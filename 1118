@@ -1,0 +1,90 @@
+1118 TUE
+
+--------------------------------------------------------------------------
+복습
+트랜잭션
+- 가상의 논리적인 하나의 작업 단위
+- all or nothing
+- dml 실행하는 순간 트랜잭션이 시작
+- 트랜잭션 종료 : commit, rollback (commit : 적용, rollback : 취소)
+- 트랜잭션 단위 : 세션 (접속)
+- lock : 다른 세션에서 변경 작업중이면 현재 세션에서는 변경 작업 시도 시 락을 건다.
+- 프로그램 연동 시 autocommit 또는 autocommit 비활성화 후 작업이 끝나면 commit 
+- 예외 발생 시 rollback
+
+DDL data definition language 데이터 정의 언어 : 객체를 생성, 수정, 삭제
+
+인덱스 
+- 조회를 빠르게 하기 위해 사용 (update, delete 등 성능은 낮아진다)
+- 특정 컬럼값 별도의 공간에 정렬해서 저장한다.
+- 일반적으로 데이터 조회, 정렬 등 기능은 실무에서는 java application에서 사용하지 않고 DB에서 모두 해결한다.
+- 실무에서는 인덱스를 직접 생성하기보다, 실행 계획을 확인할 경우가 많다. 
+
+1차 프로젝트 시 mybatis로 진행한다. (sql을 직접 짠다) => mybatis의 동적 쿼리 제작 능력을 발휘할 수 있는 프로젝트를 설계해보자.
+성능 테스트까지 꼭 하기
+
+-----------------------------------------------------------------------------------------------------
+<뷰>
+사용 이유 
+- 편리성, 보안성
+- 빠른 속도
+join이 많으면 성능이 낮아진다.
+=> join에 대한 select문을 미리 view로 만들어두고, view 조회 시 join을 하지 않고 바로 select문을 가져오기 때문에 빠른 속도 처리가 된다.
+
+//뷰, 인덱스, 시퀀스 문제
+
+-- 1번
+create table empdix 
+as select * from emp;
+select * from empdix;
+create index IDX_EMPIDX_EMPNO on empdix(empno);
+
+--인덱스 - idx_empidx_empno 조회 시 보여진다.
+select * from user_indexes;
+
+--2번
+create view temp as(
+select empno, ename, job, deptno, sal, 
+        case 
+        when comm is null then 'O' else 'X'
+        end as comm
+from emp
+where sal > 1500);
+
+
+--3번
+create table deptseq as select * from dept;
+create sequence seq_dept_deptno; -- 기본값으로 생성
+insert into deptseq values (seq_dept_deptno.nextval, 'DATABASE', 'SEOUL');
+insert into deptseq values (seq_dept_deptno.nextval, 'WEB', 'BUSAN');
+insert into deptseq values (seq_dept_deptno.nextval, 'MOBILE', 'ILSAN');
+
+
+외래키
+- 다른 테이블과 조인할 목적으로 사용
+- FK : 엄격, 무결성이 정확해야 한다, 비즈니스 로직의 유연성 감소 (업무 유연성 감소) // FK : 식별 관계 
+- 일반 컬럼 : 엄격하지 않다, 무결성 위험, 비즈니스 로직의 유연성 증대 // 일반 키 : 비식별 관계
+
+
+사용자 계정 생성
+-- orclstudy 사용자 계정 생성
+create user ORCLSTUDY identified by ORACLE;
+-- 세션 생성 권한을 제공 (접속 권한 부여)
+grant create session to ORCLSTUDY;
+
+-- orclstudy 사용자에게 testuser 스키마의 dept 조회 권한을 부여한다.
+grant select on testuser.dept to orclstudy;
+-- orclstudy 사용자에게 testuser 스키마의 dept 조회 권한을 회수한다.
+revoke select on testuser.dept from orclstudy;
+
+
+PL/SQL : SQL의 확장된 개념, 오라클에서 지원, 함수와 프로시저를 만들 수 있다.
+근래에 잘 사용하지 않는 이유 : 오라클에 종속적이며, 함수/프로시저 기능은 비즈니스 로직에서 구현한다.
+
+----------------------------------------------------------------------------------------------------------------
+<ERD>
+https://www.erdcloud.com/
+
+
+
+    
