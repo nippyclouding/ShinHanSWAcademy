@@ -108,7 +108,8 @@ public class ConnectionEx {
         }
     }
 }
-
+-----------------------------------------------------------------------------------------------------------------------------------------------
+<JDBC를 이용한 insert, delete, update, select>
 import java.sql.*;
 
 public class BoardFileInsertEx {
@@ -169,4 +170,71 @@ public class BoardFileInsertEx {
     }
 }
 
+위의 코드는 insert 예시이며, update, delete 시 쿼리만 수정하면 된다.
+아래 코드는 select에 대한 코드이며, select 시 ResultSet을 이용해 조회 결과를 출력한다.
 
+import java.sql.*;
+
+public class UserSelectEx {public static void main(String[] args) {
+    // TODO Auto-generated method stub
+    Connection conn = null;
+    PreparedStatement pstmt = null; // finally 구문에서 pstmt를 종료하기 위해 try문 밖에서 선언한다.
+    ResultSet rs = null;
+    try {
+        // 1. 드라이버 로드 (JDBC 드라이버가 DB와 연결한다)
+        Class.forName("oracle.jdbc.OracleDriver");
+
+        // 2. 커넥션 객체 생성 (드라이버를 통해 커넥션 구현체 생성)
+        conn = DriverManager.getConnection(
+                "jdbc:oracle:thin:@localhost:1521/xe",
+                "testuser",
+                "test1234"
+        );
+        System.out.println("연결 성공");
+
+        //PreparedStatement : sql String 변수를 prepareStatement 변수 속에 먼저 담아둔다. (실행하지 않는다.)
+        String sql = "" +
+                "Select userid, username, userpassword, userage, useremail " + "From users " + "where userid=?";
+
+        pstmt = conn.prepareStatement(sql); // 실행하는 것이 아니라 미리 준비한다.
+
+        //값 바인딩 : where userid = "winter" 이 된다.
+        pstmt.setString(1, "winter");
+
+        // 실행
+        rs = pstmt.executeQuery(); // 실행, ResultSet 리턴, ResultSet으로 select 결과 조회
+
+        // ResultSet을 이용한 조회
+        if(rs.next()){
+            User user = new User(
+                    rs.getString("userid"),
+                    rs.getString("username"),
+                    rs.getString("userpassword"),
+                    rs.getInt("userage"),
+                    rs.getString("useremail")
+            );
+            System.out.println("user.userId = " + user.userId);
+            System.out.println("user.userName = " + user.userName);
+            System.out.println("user.userAge = " + user.userAge);
+            System.out.println("user.userAge = " + user.userAge);
+            System.out.println("user.userEmail = " + user.userEmail);
+        }else System.out.println("사용자 아이디가 존재하지 않습니다.");
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        // 자원 해지
+        try{rs.close();}catch (Exception e){}
+        
+        try {pstmt.close();} catch (Exception e) {} //pstmt 종료
+
+        if (conn != null)
+            try {
+                conn.close();
+                System.out.println("연결 끊기");
+            } catch (SQLException e) {}
+        }
+    }
+}
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
