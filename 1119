@@ -173,6 +173,7 @@ public class BoardFileInsertEx {
 위의 코드는 insert 예시이며, update, delete 시 쿼리만 수정하면 된다.
 아래 코드는 select에 대한 코드이며, select 시 ResultSet을 이용해 조회 결과를 출력한다.
 
+1. 단건 조회 : if
 import java.sql.*;
 
 public class UserSelectEx {public static void main(String[] args) {
@@ -236,5 +237,76 @@ public class UserSelectEx {public static void main(String[] args) {
         }
     }
 }
+
+2. 복수 조회 (여러 건 조회) : while
+
+import java.sql.*;
+public class BoardSelectEx {public static void main(String[] args) {
+    // TODO Auto-generated method stub
+    Connection conn = null;
+    PreparedStatement pstmt = null; // finally 구문에서 pstmt를 종료하기 위해 try문 밖에서 선언한다.
+    ResultSet rs = null;
+    try {
+        // 1. 드라이버 로드 (JDBC 드라이버가 DB와 연결한다)
+        Class.forName("oracle.jdbc.OracleDriver");
+
+        // 2. 커넥션 객체 생성 (드라이버를 통해 커넥션 구현체 생성)
+        conn = DriverManager.getConnection(
+                "jdbc:oracle:thin:@localhost:1521/xe",
+                "testuser",
+                "test1234"
+        );
+        System.out.println("연결 성공");
+
+        //PreparedStatement : sql String 변수를 prepareStatement 변수 속에 먼저 담아둔다. (실행하지 않는다.)
+        String sql = "" +
+                "Select bno, btitle, bcontent, bwriter, bdate, bfilename, bfiledata " + "from boards " + "where bwriter=?";
+
+        pstmt = conn.prepareStatement(sql); // 실행하는 것이 아니라 미리 준비한다.
+
+        //값 바인딩 : where userid = "winter" 이 된다.
+        pstmt.setString(1, "winter");
+
+        // 실행
+        rs = pstmt.executeQuery(); // 실행, ResultSet 리턴, ResultSet으로 select 결과 조회
+
+        // ResultSet을 이용한 조회, 복수건 조회 : while
+        while(rs.next()){
+            Board board = new Board(
+                    rs.getInt("bno"),
+                    rs.getString("btitle"),
+                    rs.getString("bcontent"),
+                    rs.getString("bwriter"),
+                    rs.getDate("bdate"),
+                    rs.getString("bfilename"),
+                    rs.getBlob("bfiledata")
+            );
+            System.out.println("board.bno = " + board.bno);
+            System.out.println("board.btitle = " + board.btitle);
+            System.out.println("board.bcontent = " + board.bcontent);
+            System.out.println("board.bwriter = " + board.bwriter);
+            System.out.println("board.bdate = " + board.bdate);
+            System.out.println("board.bfilename = " + board.bfilename);
+            System.out.println("board.bfiledata = " + board.bfiledata);
+            System.out.println();
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        // 자원 해지
+        try{rs.close();}catch (Exception e){}
+
+        try {pstmt.close();} catch (Exception e) {} //pstmt 종료
+
+        if (conn != null)
+            try {
+                conn.close();
+                System.out.println("연결 끊기");
+            } catch (SQLException e) {}
+    }
+}
+}
+
 
 -----------------------------------------------------------------------------------------------------------------------------------------------
