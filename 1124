@@ -1,0 +1,27 @@
+1124 MON
+-----------------------------------------------------------------------------
+
+
+깃허브 - 깃 연동 (로컬에서 깃이 커밋되어있다고 가정)
+
+git remote add origin https://github.com/nippyclouding/test.git
+git branch -M main
+git push -u origin main
+
+=> git push -u origin main은 main 브랜치의 내용을 origin이라는 원격저장소 alias 지정, push
+
+## git 명령어
+
+git clone : 원격저장소의 모든 내용을 로컬 저장소로 복사
+git clone https://github.com/nippyclouding/test.git
+
+git remote : 로컬 저장소를 특정 원격 저장소와 연결
+
+git push : 로컬저장소의 변경사항을 원격 저장소로 보냄
+
+git fetch : 로컬저장소와 원격저장소의 변경 사항이 다른 경우 비교해서 git merge로 문제 해결
+
+git pull : push와 반대, 원격저장소의 내용을 로컬 저장소로 가져와서 병합
+
+-----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
