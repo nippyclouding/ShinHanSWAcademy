@@ -58,8 +58,10 @@ pull = fetch + merge
 git pull = git fetch + git merge (자동 병합)
 또는 git pull --rebase = git fetch + git rebase
 
-내가 pull 해야할 것이 있는데 상대가 push하려고 한다면
-=> 
+
+<이클립스 깃 연동> 
+https://codro.notion.site/06-Eclipse-Git-6211724601e347a8ab18e9313d3965af
+
 
 -----------------------------------------------------------------------------
 -----------------------------------------------------------------------------
