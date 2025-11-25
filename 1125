@@ -226,6 +226,13 @@ http://127.0.0.1:5500/03/form.html?id=testId&password=testPw&gender=%EB%82%A8&ho
 <form>
     id : <input type="text" name="id" value="a" maxlength="4" required>
 </form>
-input 태그의 속성 중 name, value, maxlength, required는 기억하기
+
+input 태그의 text, password 속성 중 name, value, maxlength, required는 기억하기
+- name : 서버에서 받을 파라미터 명칭
+- value : 입력될 텍스트 필드에 먼저 보여지는 데이터 
+- maxlength : 텍스트 필드에 입력 가능한 최대 문자 길이
+- required : 필수로 입력되어야 할 값임을 알린다.
+
+input 태그의 radio, checkbox 속성 중 value는 서버에서 받을 파라미터 명칭을 의미한다. (text의 name과 동일)
 
 ------------------------------------------------------------------------------------------------------------------------------
