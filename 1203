@@ -284,5 +284,10 @@ JS와 Json의 공통점 : {} : 객체, [] : 배열
     //팝업창을 새로 띄운다. (근래에는 거의 사용하지 않는다)
     window.open('operation.html', 'operation', 'width=300, height=300, left = 100, top = 100');
 
+    console.log(location.href);
+    //location.href = 'oper.html'; oper.html로 이동
+
 </script>
+
+<a href="oper.html" target="_blank">operation</a>
 -----------------------------------------------------------------------------------------------------------------------------------------
