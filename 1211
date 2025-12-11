@@ -20,3 +20,11 @@ HttpServletResponse response
 response.addCookie();
 response.getCookie();
 
+세션 API
+HttpServletRequest request
+request.getSession(); : 기존 세션 객체가 존재하면 리턴, 없다면 새로 생성
+request.getSession(false); : 기존 세션 객체가 존재하면 리턴, 없을 때 새로 생성하지 않는다.
+
+HttpSession session 
+session.invalidate() : 현재 생성됭 세션을 소멸
+session.getId() : String으로 id 리턴
